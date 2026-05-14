@@ -5,4 +5,5 @@ export type Flat_Rule = {
   property: string;
   value: string | number | boolean | Dynamic_Value;
   media?: string;
+  order?: number;
 };

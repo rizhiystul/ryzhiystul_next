@@ -1,19 +1,21 @@
-type Registered_Result = {
+type Register_Result = {
   new_rules: string[];
 };
 
 class Style_Registry {
-  private inserted = new Set<string>();
+  private rules = new Set<string>();
 
-  register(rules: string[]): Registered_Result {
+  register(
+    rules: string[]
+  ): Register_Result {
     const new_rules: string[] = [];
 
     for (const rule of rules) {
-      if (this.inserted.has(rule)) {
+      if (this.rules.has(rule)) {
         continue;
       }
 
-      this.inserted.add(rule);
+      this.rules.add(rule);
       new_rules.push(rule);
     }
 
@@ -23,15 +25,33 @@ class Style_Registry {
   }
 
   has(rule: string): boolean {
-    return this.inserted.has(rule);
-  }
-
-  clear(): void {
-    this.inserted.clear();
+    return this.rules.has(rule);
   }
 
   get_all(): string[] {
-    return Array.from(this.inserted);
+    return [...this.rules];
+  }
+
+  to_string(): string {
+    return this.get_all().join("");
+  }
+
+  hydrate(css_text: string): void {
+    const matches = css_text.match(
+      /[^}]+}/g
+    );
+
+    if (!matches) {
+      return;
+    }
+
+    for (const rule of matches) {
+      this.rules.add(rule);
+    }
+  }
+
+  clear(): void {
+    this.rules.clear();
   }
 }
 
