@@ -12,6 +12,8 @@ export function flatten_styles(
   styles: CSS_Object,
   options: Flatten_Options = {}
 ): Flat_Rule[] {
+
+  let index = 0;
   const rules: Flat_Rule[] = [];
 
   const selector = options.selector ?? "";
@@ -32,7 +34,8 @@ export function flatten_styles(
         selector,
         property: key,
         value,
-        media
+        media,
+        order: index++
       });
 
       continue;
@@ -49,9 +52,13 @@ export function flatten_styles(
       continue;
     }
 
+    const next_selector = key.includes("&")
+      ? key.replaceAll("&", selector || "")
+      : `${selector}${key}`;
+
     rules.push(
       ...flatten_styles(value, {
-        selector: `${selector}${key}`,
+        selector: next_selector,
         media
       })
     );

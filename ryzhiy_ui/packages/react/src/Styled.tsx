@@ -40,17 +40,50 @@ function normalize_css(
     return css;
   }
 
-  const merged: CSS_Object = {};
+  let merged: CSS_Object = {};
 
   for (const item of css) {
     if (!item) {
       continue;
     }
 
-    Object.assign(merged, item);
+    merged = merge_css_objects(
+      merged,
+      item
+    );
   }
 
   return merged;
+}
+
+function merge_css_objects(
+  target: CSS_Object,
+  source: CSS_Object
+): CSS_Object {
+  const result = { ...target };
+
+  for (const key in source) {
+    const source_value = source[key];
+    const target_value = result[key];
+
+    if (
+      source_value &&
+      typeof source_value === "object" &&
+      !Array.isArray(source_value) &&
+      !("__dynamic" in source_value)
+    ) {
+      result[key] = merge_css_objects(
+        (target_value as CSS_Object) ?? {},
+        source_value as CSS_Object
+      );
+
+      continue;
+    }
+
+    result[key] = source_value;
+  }
+
+  return result;
 }
 
 function Styled<T extends React.ElementType = "div">(
@@ -67,7 +100,10 @@ function Styled<T extends React.ElementType = "div">(
 
   const normalized = normalize_css(css);
 
-  const compiled = compile_styles(normalized);
+  const compiled = React.useMemo(
+    () => compile_styles(normalized),
+    [normalized]
+  );
 
   if (typeof window !== "undefined") {
     const active_renderer = ensure_renderer();
