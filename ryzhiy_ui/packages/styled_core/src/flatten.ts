@@ -2,10 +2,9 @@ import { is_dynamic } from "./dynamic";
 
 import type { CSS_Object } from "./types/css";
 import type {
-  Flat_Rule,
-  Keyframes_Rule,
   Flat_Entry
 } from "./types/ast";
+
 
 type Flatten_Options = {
   selector?: string;

@@ -7,6 +7,7 @@ import { is_dynamic } from "./dynamic";
 import type { CSS_Object } from "./types/css";
 import type { Flat_Rule } from "./types/ast";
 
+
 type Compiled_Style = {
   className: string;
   rules: string[];

@@ -21,8 +21,7 @@ type CSS_Properties<
     | CSS_Value;
 };
 
-
-export type CSS_Object<
+type CSS_Object<
   T_Length = string | 0,
   T_Time = string
 > =
@@ -39,3 +38,6 @@ export type CSS_Object<
       | CSS_Object<T_Length, T_Time>
       | CSS_Value;
   };
+
+
+export type { CSS_Object };
