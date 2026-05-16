@@ -1,20 +1,24 @@
-import { is_dynamic } from "../dynamic";
+import { is_dynamic } from "./dynamic";
 
-import type { CSS_Object } from "../types/css";
-import type { Flat_Rule } from "../types/ast";
+import type { CSS_Object } from "./types/css";
+import type {
+  Flat_Rule,
+  Keyframes_Rule,
+  Flat_Entry
+} from "./types/ast";
 
 type Flatten_Options = {
   selector?: string;
   media?: string;
 };
 
+let global_order = 0;
+
 export function flatten_styles(
   styles: CSS_Object,
   options: Flatten_Options = {}
-): Flat_Rule[] {
-
-  let index = 0;
-  const rules: Flat_Rule[] = [];
+): Flat_Entry[] {
+  const rules: Flat_Entry[] = [];
 
   const selector = options.selector ?? "";
   const media = options.media;
@@ -27,7 +31,20 @@ export function flatten_styles(
     }
 
     if (
+      key.startsWith("@keyframes") &&
+      typeof value === "object"
+    ) {
+      rules.push({
+        name: key.replace("@keyframes ", ""),
+        steps: value as Record<string, CSS_Object>
+      });
+
+      continue;
+    }
+
+    if (
       typeof value !== "object" ||
+      Array.isArray(value) ||
       is_dynamic(value)
     ) {
       rules.push({
@@ -35,7 +52,7 @@ export function flatten_styles(
         property: key,
         value,
         media,
-        order: index++
+        order: global_order++
       });
 
       continue;

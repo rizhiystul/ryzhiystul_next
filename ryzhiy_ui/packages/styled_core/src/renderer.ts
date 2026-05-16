@@ -3,10 +3,26 @@ class Style_Renderer {
   private sheet: CSSStyleSheet;
 
   constructor() {
-    this.style_element = document.createElement("style");
-    this.style_element.setAttribute("data-ryzhiy-ui", "true");
+    const existing = document.querySelector(
+      'style[data-ryzhiy-ui="true"]'
+    ) as HTMLStyleElement | null;
 
-    document.head.appendChild(this.style_element);
+    if (existing) {
+      this.style_element = existing;
+      this.sheet = existing.sheet as CSSStyleSheet;
+
+      return;
+    }
+
+    this.style_element = document.createElement("style");
+    this.style_element.setAttribute(
+      "data-ryzhiy-ui",
+      "true"
+    );
+
+    document.head.appendChild(
+      this.style_element
+    );
 
     this.sheet = this.style_element.sheet as CSSStyleSheet;
   }
@@ -22,6 +38,10 @@ class Style_Renderer {
     for (const rule of rules) {
       this.insert(rule);
     }
+  }
+
+  get_css_text(): string {
+    return this.style_element.textContent ?? "";
   }
 }
 
